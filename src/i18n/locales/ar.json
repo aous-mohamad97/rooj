@@ -1,0 +1,272 @@
+{
+  "common": {
+    "home": "الرئيسية",
+    "about": "من نحن",
+    "products": "المنتجات",
+    "contact": "اتصل بنا",
+    "loading": "جاري التحميل...",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "create": "إنشاء",
+    "close": "إغلاق",
+    "search": "بحث",
+    "filter": "تصفية",
+    "clear": "مسح",
+    "submit": "إرسال",
+    "send": "إرسال",
+    "back": "رجوع",
+    "next": "التالي",
+    "previous": "السابق",
+    "quickLinks": "روابط سريعة",
+    "backToWebsite": "العودة إلى الموقع",
+    "skipToContent": "تخطي إلى المحتوى الرئيسي",
+    "allRightsReserved": "جميع الحقوق محفوظة"
+  },
+  "nav": {
+    "home": "الرئيسية",
+    "about": "من نحن",
+    "products": "المنتجات",
+    "contact": "اتصل بنا",
+    "admin": "لوحة التحكم",
+    "viewSite": "عرض الموقع",
+    "signOut": "تسجيل الخروج"
+  },
+  "home": {
+    "hero": {
+      "heading": "ابني علاقة جديدة مع جسدك.",
+      "subheading": "روج إسينس هي علامة سورية مكرسة للعناية اليومية الطبيعية."
+    },
+    "valueProposition": {
+      "heading": "وعي علمي، روح طبيعية",
+      "description": "منتجاتنا مصنوعة يدوياً، مبنية على تركيبات مدروسة."
+    },
+    "features": {
+      "natural": {
+        "title": "95% طبيعي",
+        "description": "أكثر من 95% من المكونات الطبيعية المستخرجة من النباتات في كل تركيبة."
+      },
+      "certified": {
+        "title": "معتمد وآمن",
+        "description": "جميع المكونات معتمدة من دستور الأدوية الدولي الرئيسي."
+      },
+      "care": {
+        "title": "مصنوع بعناية",
+        "description": "مصنوع يدوياً في سوريا مع اهتمام دقيق بكل التفاصيل."
+      }
+    },
+    "featuredProducts": {
+      "title": "منتجات مميزة",
+      "description": "اكتشف مجموعتنا المختارة من الأساسيات الطبيعية المصنوعة يدوياً"
+    },
+    "exploreProducts": "استكشف المنتجات",
+    "shopCollection": "تسوق مجموعتنا",
+    "learnPhilosophy": "تعرف على فلسفتنا",
+    "viewAllProducts": "عرض جميع المنتجات",
+    "readyToTransform": "هل أنت مستعد لتحويل روتين العناية اليومية الخاص بك؟",
+    "discoverCollection": "اكتشف مجموعتنا من المنتجات الطبيعية المصنوعة يدوياً.",
+    "noProductsAvailable": "لا توجد منتجات متاحة في الوقت الحالي."
+  },
+  "about": {
+    "heading": "نحن نعيد تعريف العناية.",
+    "philosophy": "في روج إسينس، نؤمن بأن العناية الحقيقية تأتي من فهم الانسجام بين الطبيعة والعلم.",
+    "purityPromise": {
+      "heading": "وعدنا بالنقاء",
+      "intro": "كل منتج نصنعه هو شهادة على التزامنا بالنقاء والجودة.",
+      "natural": "مكونات 100% طبيعية",
+      "essential": "زيوت عطرية ومستخلصات",
+      "safe": {
+        "title": "معتمد وآمن",
+        "description": "جميع المكونات معتمدة من دستور الأدوية الدولي الرئيسي."
+      },
+      "commitment": "نحن ملتزمون بتزويدك بمنتجات ليست فعالة فحسب، بل آمنة أيضاً لجسدك والبيئة."
+    },
+    "tagline": "عناية طبيعية، أفضل بشكل طبيعي.",
+    "discoverProducts": "اكتشف منتجاتنا",
+    "over95Natural": "أكثر من 95% طبيعي",
+    "ourCommitment": "التزامنا",
+    "taglineFull": "روج إسينس: وعي علمي بروح طبيعية.",
+    "experienceDifference": "اختبر الفرق في العناية الطبيعية الحقيقية."
+  },
+  "products": {
+    "title": "مجموعة روج إسينس",
+    "description": "استكشف مجموعتنا من المنتجات الطبيعية المصنوعة بعناية",
+    "filterByCategory": "تصفية حسب الفئة",
+    "allCategories": "جميع الفئات",
+    "search": "بحث عن المنتجات",
+    "searchPlaceholder": "ابحث بالاسم، الوصف...",
+    "category": "الفئة",
+    "advanced": "متقدم",
+    "sortBy": "ترتيب حسب",
+    "sortDefault": "الترتيب الافتراضي",
+    "sortNameAsc": "الاسم (أ-ي)",
+    "sortNameDesc": "الاسم (ي-أ)",
+    "sortNewest": "الأحدث أولاً",
+    "sortOldest": "الأقدم أولاً",
+    "showing": "عرض {{start}}-{{end}} من {{count}} منتج",
+    "showing_one": "عرض {{start}}-{{end}} من {{count}} منتج",
+    "showing_plural": "عرض {{start}}-{{end}} من {{count}} منتجات",
+    "noProducts": "لم يتم العثور على منتجات",
+    "noProductsMatching": "لم يتم العثور على منتجات تطابق المرشحات الخاصة بك.",
+    "viewAllProducts": "عرض جميع المنتجات",
+    "getInTouch": "تواصل معنا",
+    "questionsAboutProducts": "أسئلة حول منتجاتنا؟",
+    "helpFindProducts": "نحن هنا لمساعدتك في العثور على المنتجات المثالية لاحتياجاتك."
+  },
+  "contact": {
+    "heading": "تواصل معنا",
+    "description": "نحب أن نسمع منك. أرسل لنا رسالة وسنرد في أقرب وقت ممكن.",
+    "form": {
+      "formTitle": "أرسل لنا رسالة",
+      "thankYou": "شكراً لرسالتك! سنرد عليك قريباً.",
+      "name": "الاسم",
+      "email": "البريد الإلكتروني",
+      "subject": "الموضوع",
+      "message": "الرسالة",
+      "sendMessage": "إرسال الرسالة",
+      "sending": "جاري الإرسال...",
+      "sent": "تم إرسال الرسالة بنجاح!",
+      "namePlaceholder": "اسمك",
+      "emailPlaceholder": "بريدك.الإلكتروني@example.com",
+      "subjectPlaceholder": "الموضوع",
+      "messagePlaceholder": "رسالتك..."
+    },
+    "info": {
+      "location": "الموقع",
+      "phone": "الهاتف",
+      "phoneWhatsApp": "الهاتف / واتساب",
+      "instagram": "إنستغرام",
+      "contactInformation": "معلومات الاتصال",
+      "businessHours": "ساعات العمل",
+      "responseTime": "نرد عادة خلال 24 ساعة.",
+      "urgentInquiry": "للاستفسارات العاجلة، يرجى التواصل معنا عبر واتساب."
+    }
+  },
+  "admin": {
+    "dashboard": {
+      "title": "لوحة تحكم CMS",
+      "tabs": {
+        "pages": "الصفحات",
+        "products": "المنتجات",
+        "categories": "الفئات",
+        "settings": "إعدادات الموقع",
+        "seo": "SEO"
+      }
+    },
+    "login": {
+      "title": "تسجيل دخول المدير",
+      "email": "البريد الإلكتروني",
+      "password": "كلمة المرور",
+      "signIn": "تسجيل الدخول",
+      "signingIn": "جاري تسجيل الدخول...",
+      "error": "البريد الإلكتروني أو كلمة المرور غير صحيحة"
+    },
+    "pages": {
+      "create": "صفحة جديدة",
+      "edit": "تعديل الصفحة",
+      "slug": "الرابط",
+      "title": "العنوان",
+      "content": "المحتوى",
+      "published": "منشور",
+      "save": "حفظ الصفحة",
+      "delete": "حذف الصفحة",
+      "confirmDelete": "هل أنت متأكد من حذف هذه الصفحة؟"
+    },
+    "products": {
+      "title": "إدارة المنتجات",
+      "create": "إضافة منتج",
+      "edit": "تعديل المنتج",
+      "name": "اسم المنتج",
+      "category": "الفئة",
+      "description": "الوصف",
+      "details": "التفاصيل",
+      "imageUrl": "رابط الصورة",
+      "orderIndex": "ترتيب العرض",
+      "active": "نشط (ظاهر على الموقع)",
+      "save": "حفظ المنتج",
+      "delete": "حذف المنتج",
+      "confirmDelete": "هل أنت متأكد من حذف هذا المنتج؟"
+    },
+    "categories": {
+      "title": "الفئات",
+      "create": "فئة جديدة",
+      "edit": "تعديل الفئة",
+      "name": "الاسم",
+      "slug": "الرابط",
+      "description": "الوصف",
+      "icon": "اسم الأيقونة",
+      "orderIndex": "ترتيب العرض",
+      "active": "نشط (ظاهر على الموقع)",
+      "save": "حفظ الفئة",
+      "delete": "حذف الفئة",
+      "confirmDelete": "هل أنت متأكد من حذف هذه الفئة؟ المنتجات التي تستخدم هذه الفئة ستحتاج إلى التحديث.",
+      "noCategories": "لا توجد فئات بعد. أنشئ فئتك الأولى!"
+    },
+    "settings": {
+      "title": "إعدادات الموقع",
+      "create": "إعداد جديد",
+      "edit": "تعديل الإعداد",
+      "key": "المفتاح",
+      "value": "القيمة",
+      "save": "حفظ الإعداد",
+      "delete": "حذف الإعداد",
+      "confirmDelete": "هل أنت متأكد من حذف هذا الإعداد؟"
+    },
+    "seo": {
+      "title": "إدارة SEO",
+      "global": "SEO العام",
+      "pages": "SEO الصفحات",
+      "siteName": "اسم الموقع",
+      "defaultMetaTitle": "عنوان Meta الافتراضي",
+      "defaultMetaDescription": "وصف Meta الافتراضي",
+      "defaultMetaKeywords": "كلمات Meta المفتاحية الافتراضية",
+      "defaultOgImage": "رابط صورة OG الافتراضي",
+      "twitterHandle": "معرف تويتر",
+      "googleAnalytics": "معرف Google Analytics",
+      "googleTagManager": "معرف Google Tag Manager",
+      "facebookPixel": "معرف Facebook Pixel",
+      "robotsTxt": "محتوى Robots.txt",
+      "sitemapEnabled": "تفعيل إنشاء خريطة الموقع",
+      "schemaMarkup": "Schema Markup (JSON-LD)",
+      "pageSeo": "إعدادات SEO لـ",
+      "metaTitle": "عنوان Meta",
+      "metaDescription": "وصف Meta",
+      "metaKeywords": "كلمات Meta المفتاحية",
+      "ogTitle": "عنوان OG",
+      "ogDescription": "وصف OG",
+      "ogImage": "رابط صورة OG",
+      "twitterCard": "نوع بطاقة تويتر",
+      "twitterTitle": "عنوان تويتر",
+      "twitterDescription": "وصف تويتر",
+      "twitterImage": "رابط صورة تويتر",
+      "canonicalUrl": "رابط Canonical",
+      "robots": "علامة Meta للروبوتات",
+      "save": "حفظ إعدادات SEO",
+      "selectPage": "اختر صفحة لتعديل SEO"
+    }
+  },
+  "product": {
+    "category": {
+      "skinCare": "العناية بالبشرة",
+      "fragrances": "العطور",
+      "bakhoor": "البخور"
+    },
+    "contactUs": "اتصل بنا",
+    "description": "الوصف",
+    "details": "التفاصيل"
+  },
+  "footer": {
+    "tagline": "وعي علمي بروح طبيعية. عناية يومية طبيعية سورية، مصنوعة بحب.",
+    "contact": "اتصل بنا",
+    "location": "دمشق، سوريا",
+    "phone": "+963 951 399 815",
+    "instagram": "@rooj.essence",
+    "copyright": "روج إسينس. جميع الحقوق محفوظة."
+  },
+  "header": {
+    "tagline": "العناية الأصيلة مع لمسة",
+    "taglineEn": "Authentic Care with a Touch"
+  }
+}
+
