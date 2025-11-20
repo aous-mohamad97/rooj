@@ -1,12 +1,10 @@
-# SEO Pre-rendering Setup - Quick Start
+# SEO Setup - Quick Start
 
 ## ✅ What Was Done
 
-1. **Pre-rendering Script**: Created `scripts/prerender.js` that uses Puppeteer to pre-render pages
-2. **Build Scripts**: Updated `package.json` to run pre-rendering after build
-3. **Sitemap**: Created `public/sitemap.xml` for search engines
-4. **Robots.txt**: Created `public/robots.txt` for crawler instructions
-5. **Default Meta Tags**: Added to `index.html` as fallback
+1. **Sitemap**: Created `public/sitemap.xml` for search engines
+2. **Robots.txt**: Created `public/robots.txt` for crawler instructions
+3. **Default Meta Tags**: Added to `index.html` as fallback
 
 ## 🚀 Quick Start
 
@@ -16,8 +14,6 @@
 npm install
 ```
 
-This will install Puppeteer (used for pre-rendering).
-
 ### 2. Update Sitemap
 
 Edit `public/sitemap.xml` and replace `yoursite.com` with your actual domain:
@@ -26,16 +22,13 @@ Edit `public/sitemap.xml` and replace `yoursite.com` with your actual domain:
 <loc>https://your-actual-domain.com/</loc>
 ```
 
-### 3. Build with Pre-rendering
+### 3. Build
 
 ```bash
 npm run build
 ```
 
-This will:
-- Build your React app
-- Pre-render all routes with content from your Supabase API
-- Generate SEO-friendly HTML files
+This will build your React app.
 
 ### 4. Test Locally
 
@@ -43,43 +36,25 @@ This will:
 npm run preview
 ```
 
-Visit http://localhost:4173 and view page source - you should see fully rendered HTML with content!
+Visit http://localhost:4173 to test your app.
 
 ## 📋 How It Works
 
 1. **Build Time**: 
    - Vite builds your app
-   - Puppeteer starts a local server
-   - Visits each route (/, /about, /products, /contact)
-   - Waits for Supabase API calls to complete
-   - Saves the rendered HTML
+   - Static files are generated
 
 2. **Runtime**:
    - Users visit your site
-   - React hydrates and fetches fresh content from API
-   - Everything works dynamically as before
+   - React fetches content from API
+   - Everything works dynamically
 
 3. **SEO Benefits**:
-   - ✅ Search engines see fully rendered pages
-   - ✅ Social media crawlers see Open Graph tags
-   - ✅ Fast indexing
-   - ✅ No backend needed!
+   - ✅ Sitemap helps search engines discover pages
+   - ✅ Robots.txt guides crawlers
+   - ✅ Meta tags for social media sharing
 
 ## ⚙️ Configuration
-
-### Add More Routes
-
-Edit `scripts/prerender.js`:
-
-```javascript
-const routes = [
-  '/',
-  '/about',
-  '/products',
-  '/contact',
-  '/your-new-route',  // Add here
-];
-```
 
 ### Environment Variables
 
@@ -98,8 +73,4 @@ npm run build
 3. ✅ Deploy to your hosting
 4. ✅ Submit sitemap to Google Search Console
 5. ✅ Test social media previews
-
-## 📚 More Info
-
-See `PRERENDER_README.md` for detailed documentation.
 
