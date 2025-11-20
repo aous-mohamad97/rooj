@@ -168,7 +168,7 @@ export function Home() {
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <AnimatedSection direction="fade-up" className="max-w-3xl">
-            <div className="main-title">
+            <div className="main-title mt-[-15vh]">
               <img src="/logo.png" alt="Rooj Essence" className="w-full h-full object-cover" />
             </div>
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-serif text-[#5f031a] mb-6 leading-tight">
