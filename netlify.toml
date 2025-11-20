@@ -30,8 +30,12 @@
   [headers.values]
     Content-Type = "application/javascript; charset=utf-8"
 
+# Redirect all routes to index.html for SPA routing (except static assets)
+# This includes public routes (/, /about, /products, /contact) and admin routes (/admin, /admin/dashboard)
+# React Router will handle the actual routing after the page loads
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+  force = false
 
