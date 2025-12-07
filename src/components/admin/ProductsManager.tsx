@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Edit2, Save, X, Plus, Trash2 } from 'lucide-react';
+import { Edit2, Save, X, Plus, Trash2, Upload } from 'lucide-react';
 import { MultilingualInput } from './MultilingualInput';
 import { MultilingualContent } from '../../utils/multilingual';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface Product {
   id: string;
@@ -41,6 +42,10 @@ export function ProductsManager() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
   const [isCreating, setIsCreating] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { user } = useAuth();
 
   useEffect(() => {
     loadCategories();
@@ -210,6 +215,121 @@ export function ProductsManager() {
     setEditingProduct({ ...editingProduct, [field]: value });
   };
 
+  const handleImageUpload = async (file: File) => {
+    if (!editingProduct || !user) {
+      setMessage('Please login to upload images');
+      return;
+    }
+
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!validTypes.includes(file.type)) {
+      setMessage('Invalid file type. Please upload JPEG, PNG, WebP, or GIF images.');
+      return;
+    }
+
+    // Validate file size (5MB limit)
+    if (file.size > 5 * 1024 * 1024) {
+      setMessage('File size too large. Maximum size is 5MB.');
+      return;
+    }
+
+    setUploading(true);
+    setUploadProgress(0);
+    setMessage('');
+
+    try {
+      // Generate unique filename
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${editingProduct.id || 'new'}-${Date.now()}.${fileExt}`;
+      const filePath = `products/${fileName}`;
+
+      // Delete old image if exists and product already has an ID
+      if (editingProduct.id && editingProduct.image_url) {
+        const oldImagePath = editingProduct.image_url.split('/products/')[1];
+        if (oldImagePath) {
+          await supabase.storage.from('product-images').remove([`products/${oldImagePath}`]);
+        }
+      }
+
+      // Upload new image
+      const { error: uploadError } = await supabase.storage
+        .from('product-images')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('product-images')
+        .getPublicUrl(filePath);
+
+      // Update the product with new image URL
+      setEditingProduct({
+        ...editingProduct,
+        image_url: publicUrl
+      });
+
+      setMessage('Image uploaded successfully!');
+      setTimeout(() => setMessage(''), 3000);
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      setMessage(`Error uploading image: ${errorMessage}`);
+    } finally {
+      setUploading(false);
+      setUploadProgress(0);
+    }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleImageUpload(file);
+    }
+    // Reset input so same file can be selected again
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleDeleteImage = async () => {
+    if (!editingProduct || !editingProduct.image_url) return;
+
+    try {
+      // Extract file path from URL
+      const urlParts = editingProduct.image_url.split('/products/');
+      if (urlParts.length > 1) {
+        const filePath = `products/${urlParts[1]}`;
+        const { error } = await supabase.storage
+          .from('product-images')
+          .remove([filePath]);
+
+        if (error) {
+          throw error;
+        }
+      }
+
+      // Clear image URL
+      setEditingProduct({
+        ...editingProduct,
+        image_url: ''
+      });
+
+      setMessage('Image deleted successfully!');
+      setTimeout(() => setMessage(''), 3000);
+    } catch (error) {
+      console.error('Error deleting image:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      setMessage(`Error deleting image: ${errorMessage}`);
+    }
+  };
+
   if (loading) {
     return <div className="text-center py-8">Loading products...</div>;
   }
@@ -371,17 +491,61 @@ export function ProductsManager() {
 
             <div>
               <label className="block text-sm font-medium text-[#5f031a] mb-2">
-                Image URL
+                Product Image
               </label>
+              
+              {/* File Upload Input (hidden) */}
               <input
-                type="url"
-                value={editingProduct.image_url}
-                onChange={(e) => updateField('image_url', e.target.value)}
-                placeholder="https://example.com/image.jpg"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5f031a]"
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                onChange={handleFileSelect}
+                className="hidden"
+                id="product-image-upload"
+                disabled={uploading}
               />
+
+              {/* Upload Button */}
+              <div className="flex items-center gap-4">
+                <label
+                  htmlFor="product-image-upload"
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg cursor-pointer transition-colors ${
+                    uploading
+                      ? 'bg-gray-400 text-white cursor-not-allowed'
+                      : 'bg-[#5f031a] text-[#FCF6E1] hover:bg-[#8d1a2f]'
+                  }`}
+                >
+                  <Upload size={18} />
+                  <span>{uploading ? 'Uploading...' : editingProduct.image_url ? 'Change Image' : 'Upload Image'}</span>
+                </label>
+
+                {editingProduct.image_url && (
+                  <button
+                    onClick={handleDeleteImage}
+                    type="button"
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                  >
+                    Delete Image
+                  </button>
+                )}
+              </div>
+
+              {/* Upload Progress */}
+              {uploading && (
+                <div className="mt-2">
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="bg-[#5f031a] h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${uploadProgress}%` }}
+                    ></div>
+                  </div>
+                  <p className="text-xs text-gray-600 mt-1">Uploading... {uploadProgress}%</p>
+                </div>
+              )}
+
+              {/* Image Preview */}
               {editingProduct.image_url && (
-                <div className="mt-3">
+                <div className="mt-4">
                   <p className="text-xs text-gray-600 mb-2">Image Preview:</p>
                   <div className="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden border border-gray-300">
                     <img
@@ -394,7 +558,7 @@ export function ProductsManager() {
                         if (parent && !parent.querySelector('.error-message')) {
                           const errorDiv = document.createElement('div');
                           errorDiv.className = 'error-message flex items-center justify-center h-full text-red-500 text-sm';
-                          errorDiv.textContent = 'Failed to load image. Please check the URL.';
+                          errorDiv.textContent = 'Failed to load image.';
                           parent.appendChild(errorDiv);
                         }
                       }}
@@ -402,6 +566,13 @@ export function ProductsManager() {
                   </div>
                   <p className="text-xs text-gray-500 mt-1 break-all">{editingProduct.image_url}</p>
                 </div>
+              )}
+
+              {/* Help Text */}
+              {!editingProduct.image_url && (
+                <p className="text-xs text-gray-500 mt-2">
+                  Upload JPEG, PNG, WebP, or GIF images. Maximum file size: 5MB
+                </p>
               )}
             </div>
 
