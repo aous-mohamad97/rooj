@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Layout } from "../components/Layout";
 import { supabase } from "../lib/supabase";
-import { MapPin, Phone, Instagram } from "lucide-react";
+import { MapPin, Phone, Instagram, Mail, Facebook } from "lucide-react";
 import { AnimatedSection } from "../components/AnimatedSection";
 import { SEOHead } from "../components/SEOHead";
 import { useTranslation } from "react-i18next";
@@ -10,15 +10,26 @@ import { getMultilingualText } from "../utils/multilingual";
 interface ContactContent {
   heading: string;
   description: string;
-  location: string;
-  phone: string;
-  instagram: string;
+}
+
+interface ContactInfo {
+  location?: string;
+  location_multilingual?: Record<string, string>;
+  phone?: string;
+  phone_multilingual?: Record<string, string>;
+  email?: string;
+  instagram?: string;
+  instagram_multilingual?: Record<string, string>;
+  facebook?: string;
+  facebook_multilingual?: Record<string, string>;
+  twitter?: string;
 }
 
 export function Contact() {
   const { t, i18n } = useTranslation();
   const currentLang = i18n.language || 'en';
   const [content, setContent] = useState<ContactContent | null>(null);
+  const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     name: "",
@@ -31,41 +42,52 @@ export function Contact() {
 
   useEffect(() => {
     async function loadContent() {
-      const { data } = await supabase
-        .from("pages")
-        .select("content, content_multilingual, title_multilingual")
-        .eq("slug", "contact")
-        .maybeSingle();
+      try {
+        // Load page content (heading, description) from pages table
+        const { data: pageData } = await supabase
+          .from("pages")
+          .select("content, content_multilingual, title_multilingual")
+          .eq("slug", "contact")
+          .maybeSingle();
 
-      if (data) {
-        // Use multilingual content if available, otherwise fallback to old content
-        const multilingualContent = data.content_multilingual || data.content;
-        
-        // Extract language-specific content from nested multilingual structure
-        let contentForLang: ContactContent | null = null;
-        
-        if (multilingualContent && typeof multilingualContent === 'object') {
-          const heading = (multilingualContent as Record<string, unknown>)?.heading;
-          const description = (multilingualContent as Record<string, unknown>)?.description;
-          const location = (multilingualContent as Record<string, unknown>)?.location;
-          const phone = (multilingualContent as Record<string, unknown>)?.phone;
-          const instagram = (multilingualContent as Record<string, unknown>)?.instagram;
-          const fallbackContent = data.content as ContactContent | null;
+        if (pageData) {
+          // Use multilingual content if available, otherwise fallback to old content
+          const multilingualContent = pageData.content_multilingual || pageData.content;
           
-          if (heading || description || location || phone || instagram) {
-            contentForLang = {
-              heading: getMultilingualText(heading as string | Record<string, string> | undefined, currentLang) || fallbackContent?.heading || '',
-              description: getMultilingualText(description as string | Record<string, string> | undefined, currentLang) || fallbackContent?.description || '',
-              location: getMultilingualText(location as string | Record<string, string> | undefined, currentLang) || fallbackContent?.location || '',
-              phone: getMultilingualText(phone as string | Record<string, string> | undefined, currentLang) || fallbackContent?.phone || '',
-              instagram: getMultilingualText(instagram as string | Record<string, string> | undefined, currentLang) || fallbackContent?.instagram || '',
-            };
+          // Extract language-specific content from nested multilingual structure
+          let contentForLang: ContactContent | null = null;
+          
+          if (multilingualContent && typeof multilingualContent === 'object') {
+            const heading = (multilingualContent as Record<string, unknown>)?.heading;
+            const description = (multilingualContent as Record<string, unknown>)?.description;
+            const fallbackContent = pageData.content as ContactContent | null;
+            
+            if (heading || description) {
+              contentForLang = {
+                heading: getMultilingualText(heading as string | Record<string, string> | undefined, currentLang) || fallbackContent?.heading || '',
+                description: getMultilingualText(description as string | Record<string, string> | undefined, currentLang) || fallbackContent?.description || '',
+              };
+            }
           }
+          
+          setContent(contentForLang || (pageData.content as ContactContent));
         }
-        
-        setContent(contentForLang || (data.content as ContactContent));
+
+        // Load contact information from site_settings
+        const { data: contactData } = await supabase
+          .from('site_settings')
+          .select('value')
+          .eq('key', 'contact_info')
+          .maybeSingle();
+
+        if (contactData?.value) {
+          setContactInfo(contactData.value as ContactInfo);
+        }
+      } catch (error) {
+        console.error('Error loading contact page data:', error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
 
     loadContent();
@@ -130,55 +152,102 @@ export function Contact() {
                   </h2>
 
                   <div className="space-y-6">
-                    <div className="flex items-start space-x-4 p-6 bg-[#FCF6E1] rounded-xl hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
-                      <div className="flex-shrink-0 transform transition-transform duration-300 hover:scale-110">
-                        <MapPin className="text-[#5f031a]" size={24} />
+                    {contactInfo?.location && (
+                      <div className="flex items-start space-x-4 p-6 bg-[#FCF6E1] rounded-xl hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                        <div className="flex-shrink-0 transform transition-transform duration-300 hover:scale-110">
+                          <MapPin className="text-[#5f031a]" size={24} />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-medium text-[#5f031a] mb-1 transition-colors duration-300 hover:text-[#8d1a2f]">
+                            {t('contact.info.location')}
+                          </h3>
+                          <p className="text-[#4a4a4a]">
+                            {getMultilingualText(contactInfo.location_multilingual || contactInfo.location, currentLang) || contactInfo.location}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="text-lg font-medium text-[#5f031a] mb-1 transition-colors duration-300 hover:text-[#8d1a2f]">
-                          {t('contact.info.location')}
-                        </h3>
-                        <p className="text-[#4a4a4a]">
-                          {getMultilingualText(content?.location, currentLang) || t('footer.location')}
-                        </p>
-                      </div>
-                    </div>
+                    )}
 
-                    <div className="flex items-start space-x-4 p-6 bg-[#FCF6E1] rounded-xl hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
-                      <div className="flex-shrink-0 transform transition-transform duration-300 hover:scale-110">
-                        <Phone className="text-[#5f031a]" size={24} />
+                    {contactInfo?.phone && (
+                      <div className="flex items-start space-x-4 p-6 bg-[#FCF6E1] rounded-xl hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                        <div className="flex-shrink-0 transform transition-transform duration-300 hover:scale-110">
+                          <Phone className="text-[#5f031a]" size={24} />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-medium text-[#5f031a] mb-1 transition-colors duration-300 hover:text-[#8d1a2f]">
+                            {t('contact.info.phoneWhatsApp')}
+                          </h3>
+                          <a
+                            href={`tel:${(getMultilingualText(contactInfo.phone_multilingual || contactInfo.phone, currentLang) || contactInfo.phone).replace(/\s/g, '')}`}
+                            className="text-[#4a4a4a] hover:text-[#5f031a] transition-all duration-300 transform hover:scale-105 inline-block"
+                            dir="ltr"
+                          >
+                            {getMultilingualText(contactInfo.phone_multilingual || contactInfo.phone, currentLang) || contactInfo.phone}
+                          </a>
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="text-lg font-medium text-[#5f031a] mb-1 transition-colors duration-300 hover:text-[#8d1a2f]">
-                          {t('contact.info.phoneWhatsApp')}
-                        </h3>
-                        <a
-                          href={`tel:${getMultilingualText(content?.phone, currentLang) || "+963951399815"}`}
-                          className="text-[#4a4a4a] hover:text-[#5f031a] transition-all duration-300 transform hover:scale-105 inline-block"
-                        >
-                          {getMultilingualText(content?.phone, currentLang) || t('footer.phone')}
-                        </a>
-                      </div>
-                    </div>
+                    )}
 
-                    <div className="flex items-start space-x-4 p-6 bg-[#FCF6E1] rounded-xl hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
-                      <div className="flex-shrink-0 transform transition-transform duration-300 hover:scale-110">
-                        <Instagram className="text-[#5f031a]" size={24} />
+                    {contactInfo?.email && (
+                      <div className="flex items-start space-x-4 p-6 bg-[#FCF6E1] rounded-xl hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                        <div className="flex-shrink-0 transform transition-transform duration-300 hover:scale-110">
+                          <Mail className="text-[#5f031a]" size={24} />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-medium text-[#5f031a] mb-1 transition-colors duration-300 hover:text-[#8d1a2f]">
+                            {t('contact.info.email') || 'Email'}
+                          </h3>
+                          <a
+                            href={`mailto:${contactInfo.email}`}
+                            className="text-[#4a4a4a] hover:text-[#5f031a] transition-all duration-300 transform hover:scale-105 inline-block"
+                          >
+                            {contactInfo.email}
+                          </a>
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="text-lg font-medium text-[#5f031a] mb-1 transition-colors duration-300 hover:text-[#8d1a2f]">
-                          {t('contact.info.instagram')}
-                        </h3>
-                        <a
-                          href="https://instagram.com/rooj.essence"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[#4a4a4a] hover:text-[#5f031a] transition-all duration-300 transform hover:scale-105 inline-block"
-                        >
-                          {getMultilingualText(content?.instagram, currentLang) || "@rooj.essence"}
-                        </a>
+                    )}
+
+                    {contactInfo?.instagram && (
+                      <div className="flex items-start space-x-4 p-6 bg-[#FCF6E1] rounded-xl hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                        <div className="flex-shrink-0 transform transition-transform duration-300 hover:scale-110">
+                          <Instagram className="text-[#5f031a]" size={24} />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-medium text-[#5f031a] mb-1 transition-colors duration-300 hover:text-[#8d1a2f]">
+                            {t('contact.info.instagram')}
+                          </h3>
+                          <a
+                            href={`https://instagram.com/${contactInfo.instagram.replace('@', '')}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[#4a4a4a] hover:text-[#5f031a] transition-all duration-300 transform hover:scale-105 inline-block"
+                          >
+                            {getMultilingualText(contactInfo.instagram_multilingual || contactInfo.instagram, currentLang) || contactInfo.instagram}
+                          </a>
+                        </div>
                       </div>
-                    </div>
+                    )}
+
+                    {contactInfo?.facebook && (
+                      <div className="flex items-start space-x-4 p-6 bg-[#FCF6E1] rounded-xl hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                        <div className="flex-shrink-0 transform transition-transform duration-300 hover:scale-110">
+                          <Facebook className="text-[#5f031a]" size={24} />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-medium text-[#5f031a] mb-1 transition-colors duration-300 hover:text-[#8d1a2f]">
+                            {t('contact.info.facebook') || 'Facebook'}
+                          </h3>
+                          <a
+                            href={`https://facebook.com/${contactInfo.facebook.replace('@', '')}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[#4a4a4a] hover:text-[#5f031a] transition-all duration-300 transform hover:scale-105 inline-block"
+                          >
+                            {getMultilingualText(contactInfo.facebook_multilingual || contactInfo.facebook, currentLang) || contactInfo.facebook}
+                          </a>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="mt-8 p-6 bg-[#5f031a] text-[#FCF6E1] rounded-xl hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">

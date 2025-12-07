@@ -240,16 +240,37 @@ export function ProductsManager() {
           {products.map((product) => (
             <div
               key={product.id}
-              className="flex items-center justify-between p-4 bg-[#FCF6E1] rounded-lg"
+              className="flex items-center gap-4 p-4 bg-[#FCF6E1] rounded-lg"
             >
-              <div className="flex-1">
+              {product.image_url ? (
+                <div className="flex-shrink-0 w-20 h-20 bg-gray-200 rounded-lg overflow-hidden border border-gray-300">
+                  <img
+                    src={product.image_url}
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                </div>
+              ) : (
+                <div className="flex-shrink-0 w-20 h-20 bg-gray-200 rounded-lg border border-gray-300 flex items-center justify-center">
+                  <span className="text-xs text-gray-400 text-center px-2">No image</span>
+                </div>
+              )}
+              <div className="flex-1 min-w-0">
                 <h3 className="text-lg font-medium text-[#5f031a]">{product.name}</h3>
                 <p className="text-sm text-gray-600">
                   {product.categories?.name || product.category} • Order: {product.order_index}
                 </p>
-                <p className="text-sm text-gray-500 mt-1">{product.description}</p>
+                <p className="text-sm text-gray-500 mt-1 line-clamp-2">{product.description}</p>
+                {product.image_url && (
+                  <p className="text-xs text-gray-400 mt-1 truncate" title={product.image_url}>
+                    {product.image_url}
+                  </p>
+                )}
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 flex-shrink-0">
                 <button
                   onClick={() => handleEdit(product)}
                   className="flex items-center space-x-2 bg-[#5f031a] text-[#FCF6E1] px-4 py-2 rounded-lg hover:bg-[#8d1a2f] transition-colors"
@@ -347,6 +368,42 @@ export function ProductsManager() {
               type="textarea"
               rows={6}
             />
+
+            <div>
+              <label className="block text-sm font-medium text-[#5f031a] mb-2">
+                Image URL
+              </label>
+              <input
+                type="url"
+                value={editingProduct.image_url}
+                onChange={(e) => updateField('image_url', e.target.value)}
+                placeholder="https://example.com/image.jpg"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5f031a]"
+              />
+              {editingProduct.image_url && (
+                <div className="mt-3">
+                  <p className="text-xs text-gray-600 mb-2">Image Preview:</p>
+                  <div className="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden border border-gray-300">
+                    <img
+                      src={editingProduct.image_url}
+                      alt="Product preview"
+                      className="w-full h-full object-contain"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                        const parent = (e.target as HTMLImageElement).parentElement;
+                        if (parent && !parent.querySelector('.error-message')) {
+                          const errorDiv = document.createElement('div');
+                          errorDiv.className = 'error-message flex items-center justify-center h-full text-red-500 text-sm';
+                          errorDiv.textContent = 'Failed to load image. Please check the URL.';
+                          parent.appendChild(errorDiv);
+                        }
+                      }}
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1 break-all">{editingProduct.image_url}</p>
+                </div>
+              )}
+            </div>
 
             <div>
               <label className="block text-sm font-medium text-[#5f031a] mb-2">

@@ -1,5 +1,5 @@
 import { ReactNode, useState, useEffect } from 'react';
-import { Menu, X, Instagram, Phone, MapPin, Mail } from 'lucide-react';
+import { Menu, X, Instagram, Phone, MapPin, Mail, Facebook } from 'lucide-react';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabase';
@@ -18,6 +18,7 @@ interface ContactInfo {
   instagram?: string;
   instagram_multilingual?: Record<string, string>;
   facebook?: string;
+  facebook_multilingual?: Record<string, string>;
   twitter?: string;
 }
 
@@ -164,9 +165,9 @@ export function Layout({ children }: LayoutProps) {
                 <div className="text-2xl font-serif">
                   {getMultilingualText(siteInfo?.site_name_multilingual || siteInfo?.site_name, currentLang) || 'Rooj Essence'}
                 </div>
-                <div className="text-xs opacity-90">
+                {/* <div className="text-xs opacity-90">
                   {getMultilingualText(siteInfo?.tagline_multilingual || siteInfo?.tagline, currentLang) || t('header.tagline')}
-                </div>
+                </div> */}
               </div>
             </a>
 
@@ -243,6 +244,7 @@ export function Layout({ children }: LayoutProps) {
                     <a 
                       href={`tel:${contactInfo.phone.replace(/\s/g, '')}`}
                       className="hover:text-white transition-all duration-300 transform hover:scale-105 inline-block"
+                      dir="ltr"
                     >
                       {getMultilingualText(contactInfo.phone_multilingual || contactInfo.phone, currentLang) || contactInfo.phone}
                     </a>
@@ -269,6 +271,19 @@ export function Layout({ children }: LayoutProps) {
                       className="hover:text-white transition-all duration-300 transform hover:scale-105 inline-block"
                     >
                       {getMultilingualText(contactInfo.instagram_multilingual || contactInfo.instagram, currentLang) || contactInfo.instagram}
+                    </a>
+                  </div>
+                )}
+                {contactInfo?.facebook && (
+                  <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                    <Facebook size={16} />
+                    <a 
+                      href={`https://facebook.com/${contactInfo.facebook.replace('@', '')}`} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="hover:text-white transition-all duration-300 transform hover:scale-105 inline-block"
+                    >
+                      {getMultilingualText(contactInfo.facebook_multilingual || contactInfo.facebook, currentLang) || contactInfo.facebook}
                     </a>
                   </div>
                 )}
