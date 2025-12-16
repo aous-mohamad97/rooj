@@ -283,7 +283,7 @@ export function Layout({ children }: LayoutProps) {
                       rel="noopener noreferrer" 
                       className="hover:text-white transition-all duration-300 transform hover:scale-105 inline-block"
                     >
-                      {getMultilingualText(contactInfo.facebook_multilingual || contactInfo.facebook, currentLang) || contactInfo.facebook}
+                      Rooj-Essence
                     </a>
                   </div>
                 )}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Layout } from "../components/Layout";
 import { supabase } from "../lib/supabase";
 import { Droplet, Sparkles, Flame, Search, X, ChevronLeft, ChevronRight, SlidersHorizontal } from "lucide-react";
@@ -36,6 +36,9 @@ type SortOption = 'name_asc' | 'name_desc' | 'newest' | 'oldest' | 'order_index'
 export function Products() {
   const { t, i18n } = useTranslation();
   const currentLang = i18n.language || 'en';
+  const isRTL = (i18n.dir && i18n.dir(currentLang) === 'rtl') || currentLang.startsWith('ar');
+  const productsSectionRef = useRef<HTMLDivElement | null>(null);
+  const filtersRef = useRef<HTMLDivElement | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -136,6 +139,26 @@ export function Products() {
   const endIndex = startIndex + productsPerPage;
   const paginatedProducts = sortedProducts.slice(startIndex, endIndex);
 
+  const scrollToFiltersTop = () => {
+    const targetEl = filtersRef.current || productsSectionRef.current;
+    if (targetEl) {
+      const top =
+        targetEl.getBoundingClientRect().top +
+        window.scrollY;
+
+      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+      return;
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const goToPage = (page: number) => {
+    setCurrentPage(page);
+    // Ensure scroll happens after state updates/render
+    requestAnimationFrame(scrollToFiltersTop);
+  };
+
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
@@ -191,7 +214,11 @@ export function Products() {
     <Layout>
       <SEOHead pageSlug="products" />
       <main>
-        <section className="py-20 bg-white relative" aria-label="Products">
+        <section
+          ref={productsSectionRef}
+          className="py-20 bg-white relative"
+          aria-label="Products"
+        >
           <div
             className="absolute inset-0 opacity-10 z-1"
             style={{
@@ -212,7 +239,10 @@ export function Products() {
             </AnimatedSection>
 
             <AnimatedSection direction="fade-up" delay={200}>
-              <div className="bg-[#FCF6E1] rounded-2xl p-6 mb-12 hover:shadow-lg transition-all duration-300">
+              <div
+                ref={filtersRef}
+                className="bg-[#FCF6E1] rounded-2xl p-6 mb-12 hover:shadow-lg transition-all duration-300"
+              >
                 {/* Main Filter Bar */}
                 <div className="flex flex-col md:flex-row gap-4 items-end mb-4">
                   <div className="flex-1">
@@ -361,97 +391,118 @@ export function Products() {
                   role="list"
                 >
                   {paginatedProducts.map((product, index) => {
-                  const Icon = getCategoryIcon(product.category);
-                  return (
-                    <AnimatedSection
-                      key={product.id}
-                      direction="fade-up"
-                      delay={index * 100}
-                      className="h-full"
-                    >
-                      <article
-                        onClick={() => handleProductClick(product)}
-                        className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-[#5f031a]/10 h-full flex flex-col cursor-pointer"
-                        role="listitem"
-                        itemScope
-                        itemType="https://schema.org/Product"
+                    const Icon = getCategoryIcon(product.category);
+
+                    // Localized product content
+                    const localizedName = getMultilingualText(
+                      product.name_multilingual || product.name,
+                      currentLang
+                    );
+                    const localizedDescription = getMultilingualText(
+                      product.description_multilingual || product.description,
+                      currentLang
+                    );
+                    const localizedDetails = getMultilingualText(
+                      product.details_multilingual || product.details || "",
+                      currentLang
+                    );
+                    const localizedCategoryName =
+                      getMultilingualText(
+                        product.categories?.name_multilingual ||
+                          product.categories?.name ||
+                          "",
+                        currentLang
+                      ) ||
+                      getCategoryLabel(product.categories?.slug || product.category);
+
+                    return (
+                      <AnimatedSection
+                        key={product.id}
+                        direction="fade-up"
+                        delay={index * 100}
+                        className="h-full"
                       >
-                        <div className="relative overflow-hidden h-72 bg-gradient-to-br from-[#FCF6E1] to-[#f5f1e8] flex-shrink-0">
-                          {product.image_url ? (
-                            <img
-                              src={product.image_url}
-                              alt={`${product.name} - ${getCategoryLabel(
-                                product.categories?.slug || product.category
-                              )} product. ${product.description.substring(
-                                0,
-                                100
-                              )}`}
-                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                              loading="lazy"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <div className="text-center">
-                                <Icon
-                                  className="mx-auto mb-3 text-[#5f031a] opacity-20"
-                                  size={48}
-                                />
-                                <span className="text-[#5f031a] text-opacity-30 text-sm">
-                                  No image available
-                                </span>
+                        <article
+                          onClick={() => handleProductClick(product)}
+                          className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-[#5f031a]/10 h-full flex flex-col cursor-pointer"
+                          role="listitem"
+                          itemScope
+                          itemType="https://schema.org/Product"
+                        >
+                          <div className="relative overflow-hidden h-72 bg-gradient-to-br from-[#FCF6E1] to-[#f5f1e8] flex-shrink-0">
+                            {product.image_url ? (
+                              <img
+                                src={product.image_url}
+                                alt={`${localizedName} - ${localizedCategoryName} product. ${localizedDescription.substring(
+                                  0,
+                                  100
+                                )}`}
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                                loading="lazy"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <div className="text-center">
+                                  <Icon
+                                    className="mx-auto mb-3 text-[#5f031a] opacity-20"
+                                    size={48}
+                                  />
+                                  <span className="text-[#5f031a] text-opacity-30 text-sm">
+                                    No image available
+                                  </span>
+                                </div>
                               </div>
+                            )}
+                            <div className="absolute top-3 right-3">
+                              <span className="inline-block text-xs font-bold text-[#5f031a] bg-white/90 px-3 py-1 rounded-full backdrop-blur-sm">
+                                {localizedCategoryName}
+                              </span>
                             </div>
-                          )}
-                          <div className="absolute top-3 right-3">
-                        <span className="inline-block text-xs font-bold text-[#5f031a] bg-white/90 px-3 py-1 rounded-full backdrop-blur-sm">
-                          {getMultilingualText(product.categories?.name_multilingual || product.categories?.name || '', currentLang) || getCategoryLabel(product.categories?.slug || product.category)}
-                        </span>
                           </div>
-                        </div>
 
-                        <div className="p-6 flex flex-col flex-1 min-h-0">
-                          <h3
-                            className="text-xl font-serif text-[#5f031a] mb-2 group-hover:text-[#8d1a2f] transition-colors"
-                            itemProp="name"
-                          >
-                            {product.name}
-                          </h3>
-                          <p
-                            className="text-[#4a4a4a] text-sm leading-relaxed mb-4 flex-1 min-h-[3rem]"
-                            itemProp="description"
-                          >
-                            {product.description}
-                          </p>
+                          <div className="p-6 flex flex-col flex-1 min-h-0">
+                            <h3
+                              className="text-xl font-serif text-[#5f031a] mb-2 group-hover:text-[#8d1a2f] transition-colors"
+                              itemProp="name"
+                            >
+                              {localizedName}
+                            </h3>
+                            <p
+                              className="text-[#4a4a4a] text-sm leading-relaxed mb-4 flex-1 min-h-[3rem]"
+                              itemProp="description"
+                            >
+                              {localizedDescription}
+                            </p>
 
-                          {product.details && (
-                            <div className="border-t border-[#5f031a]/10 pt-4 mt-auto">
-                              <p className="text-[#4a4a4a] text-xs leading-relaxed">
-                                {product.details.substring(0, 120)}
-                                {product.details.length > 120 ? "..." : ""}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      </article>
-                    </AnimatedSection>
-                  );
-                })}
+                            {localizedDetails && (
+                              <div className="border-t border-[#5f031a]/10 pt-4 mt-auto">
+                                <p className="text-[#4a4a4a] text-xs leading-relaxed">
+                                  {localizedDetails.substring(0, 120)}
+                                  {localizedDetails.length > 120 ? "..." : ""}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </article>
+                      </AnimatedSection>
+                    );
+                  })}
                 </div>
 
                 {/* Pagination */}
                 {totalPages > 1 && (
                   <div className="mt-12 flex items-center justify-center gap-2">
                     <button
-                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                      onClick={() => goToPage(Math.max(1, currentPage - 1))}
                       disabled={currentPage === 1}
                       className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 ${
                         currentPage === 1
                           ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                           : 'bg-[#5f031a] text-[#FCF6E1] hover:bg-[#8d1a2f] transform hover:scale-105'
-                      }`}
+                      } ${isRTL ? 'flex-row-reverse' : ''}`}
                       aria-label="Previous page"
                     >
-                      <ChevronLeft size={18} />
+                      {isRTL ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
                       <span>{t('common.previous') || 'Previous'}</span>
                     </button>
 
@@ -466,7 +517,7 @@ export function Products() {
                           return (
                             <button
                               key={page}
-                              onClick={() => setCurrentPage(page)}
+                              onClick={() => goToPage(page)}
                               className={`min-w-[40px] px-3 py-2 rounded-lg transition-all duration-300 ${
                                 currentPage === page
                                   ? 'bg-[#5f031a] text-[#FCF6E1] font-semibold shadow-md'
@@ -493,17 +544,17 @@ export function Products() {
                     </div>
 
                     <button
-                      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                      onClick={() => goToPage(Math.min(totalPages, currentPage + 1))}
                       disabled={currentPage === totalPages}
                       className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 ${
                         currentPage === totalPages
                           ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                           : 'bg-[#5f031a] text-[#FCF6E1] hover:bg-[#8d1a2f] transform hover:scale-105'
-                      }`}
+                      } ${isRTL ? 'flex-row-reverse' : ''}`}
                       aria-label="Next page"
                     >
                       <span>{t('common.next') || 'Next'}</span>
-                      <ChevronRight size={18} />
+                      {isRTL ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
                     </button>
                   </div>
                 )}
